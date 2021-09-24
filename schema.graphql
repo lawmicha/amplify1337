@@ -1,0 +1,42 @@
+type User
+  @model
+  @auth(
+    rules: [
+      { allow: owner, operations: [create, delete, update] }
+    ]
+  ) {
+  id: ID!
+  owner: String
+  username: String!
+  comments: [UserComment] @connection(keyName: "byUser", fields: ["id"])
+}
+
+type UserComment
+  @model
+  @auth(
+  rules: [
+      { allow: owner, operations: [create, delete, update] }
+    ]
+  )
+  @key(name: "byUser", fields: ["userId", "commentId"])
+  @key(name: "byComment", fields: ["commentId", "userId"]) {
+  id: ID!
+  liked: Boolean!
+  userId: ID!
+  commentId: ID!
+  user: User! @connection(fields: ["userId"])
+  comment: Comment! @connection(fields: ["commentId"])
+}
+
+type Comment
+  @model
+  @auth(
+    rules: [
+      { allow: owner, operations: [create, delete, update] }
+    ]
+  ) {
+  id: ID!
+  title: String!
+  content: String!
+  users: [UserComment] @connection(keyName: "byComment", fields: ["id"])
+} 
